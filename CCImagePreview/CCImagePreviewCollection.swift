@@ -51,8 +51,10 @@ class CCImagePreviewCollection: UICollectionView {
             switch style {
             case .dark:
                 backgroundColor = .black
+                visibleCells.forEach { ($0 as? CCImagePreviewCell)?.marginColor = .black }
             case .light:
                 backgroundColor = .white
+                visibleCells.forEach { ($0 as? CCImagePreviewCell)?.marginColor = .white }
             }
         }
     }
@@ -130,15 +132,35 @@ class CCImagePreviewCollection: UICollectionView {
 
 extension CCImagePreviewCollection: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        var progress = (scrollView.contentOffset.x / scrollView.contentSize.width)
+        let progress = (scrollView.contentOffset.x / scrollView.contentSize.width)
         guard !progress.isNaN else { return }
+
+        let N = CGFloat(previewDataSource?.numberOfImages(inImagePreviewCollection: self) ?? 0)
         
-        progress = min(max(progress, 0), 1)
-        
-        let index = Int(progress * CGFloat(previewDataSource?.numberOfImages(inImagePreviewCollection: self) ?? 0))
-        if index != currentIndex {
-            currentIndex = index
+        let standardProgress = min(max(progress, 0), 1)
+        let standardIndex = Int(floor(standardProgress * N))
+        if standardIndex != currentIndex {
+            currentIndex = standardIndex
             previewDelegate?.imagePreviewCollection?(self, currentIndexChanged: currentIndex)
+        }
+        
+        let index = Int(floor(progress * N))
+        if progress * N < CGFloat(index) {
+            let rate = Float(ceil(progress * N) - progress * N)
+
+            (cellForItem(at: IndexPath(row: index - 1, section: 0))
+                as? CCImagePreviewCell)?.marginRate = min(max(-rate, -1), 1)
+
+            (cellForItem(at: IndexPath(row: index, section: 0))
+                as? CCImagePreviewCell)?.marginRate = min(max(1 - rate, -1), 1)
+        } else {
+            let rate = Float(progress * N - floor(progress * N))
+
+            (cellForItem(at: IndexPath(row: index, section: 0))
+                as? CCImagePreviewCell)?.marginRate = min(max(-rate, -1), 1)
+            
+            (cellForItem(at: IndexPath(row: index + 1, section: 0))
+                as? CCImagePreviewCell)?.marginRate = min(max(1 - rate, -1), 1)
         }
     }
 }
@@ -146,7 +168,16 @@ extension CCImagePreviewCollection: UIScrollViewDelegate {
 
 extension CCImagePreviewCollection: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as? CCImagePreviewCell)?.imageUpdated()
+        guard let cell = cell as? CCImagePreviewCell else { return }
+        
+        cell.imageUpdated()
+        
+        switch style {
+        case .dark:
+            cell.marginColor = .black
+        case .light:
+            cell.marginColor = .white
+        }
     }
 }
 

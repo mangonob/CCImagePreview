@@ -12,12 +12,48 @@ class CCImagePreviewCell: UICollectionViewCell {
     lazy var scrollView = UIScrollView()
     lazy var zoomView = UIView()
     lazy var imageView = UIImageView()
+    private lazy var marginView = UIView()
     
-    var rowInCollection: Int = 0
-
+    var marginColor: UIColor? {
+        get {
+            return marginView.backgroundColor
+        }
+        set {
+            marginView.backgroundColor = newValue
+        }
+    }
+    
     fileprivate var image: UIImage? {
         didSet {
             imageUpdated()
+        }
+    }
+    
+    var marginLength: CGFloat = 40
+
+    var marginRate: Float = 0 {
+        didSet {
+            guard marginRate != oldValue else { return }
+            
+            if marginRate == 0 {
+                marginView.removeFromSuperview()
+            } else {
+                if marginView.superview == nil {
+                    contentView.addSubview(marginView)
+                }
+                
+                if marginRate > 0 {
+                    let leftTop = CGPoint(x: zoomView.bounds.minX, y: zoomView.bounds.minY)
+                    let width = max(0, zoomView.convert(leftTop, to: contentView).x)
+                        + CGFloat(marginRate) * marginLength
+                    marginView.frame = contentView.bounds.divided(atDistance: width, from: .minXEdge).slice
+                } else {
+                    let rightTop = CGPoint(x: zoomView.bounds.maxX, y: zoomView.bounds.maxY)
+                    let width = max(0, contentView.bounds.maxX - zoomView.convert(rightTop, to: contentView).x)
+                        - CGFloat(marginRate) * marginLength
+                    marginView.frame = contentView.bounds.divided(atDistance: width, from: .maxXEdge).slice
+                }
+            }
         }
     }
     
@@ -28,7 +64,7 @@ class CCImagePreviewCell: UICollectionViewCell {
         }
         
         if scrollView.superview == nil {
-            contentView.addSubview(scrollView)
+            contentView.insertSubview(scrollView, at: 0)
         }
         
         imageView.image = image
