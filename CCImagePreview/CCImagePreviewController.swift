@@ -25,6 +25,10 @@ class CCImagePreviewController: UIViewController {
     private lazy var preview = CCImagePreviewCollection()
     
     override func viewDidLoad() {
+        images = [
+            #imageLiteral(resourceName: "image1"),#imageLiteral(resourceName: "image2"),#imageLiteral(resourceName: "image3")
+            ].map { CCImage.image($0) }
+        
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.

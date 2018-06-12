@@ -26,7 +26,7 @@ enum CCImagePreviewCollectionStyle: Int {
 
 
 class CCImagePreviewCollection: UICollectionView {
-    var currentIndex: Int = NSNotFound
+    var currentIndex: Int = 0
 
     weak var previewDataSource: CCImagePreviewCollectionDataSource? {
         didSet {
@@ -72,7 +72,12 @@ class CCImagePreviewCollection: UICollectionView {
 
         register(CCImagePreviewCell.self, forCellWithReuseIdentifier: previewCellIdentifier)
         
-        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.tapHandler(_:))))
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(self.doubleTapHandler(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        let click = UITapGestureRecognizer(target: self, action: #selector(self.tapHandler(_:)))
+        click.require(toFail: doubleTap)
+        addGestureRecognizer(click)
+        addGestureRecognizer(doubleTap)
     }()
 
     init() {
@@ -113,6 +118,12 @@ class CCImagePreviewCollection: UICollectionView {
                             cell.style = .dark
                         }
             }, completion: nil)
+    }
+
+    @objc private func doubleTapHandler(_ sender: UITapGestureRecognizer) {
+        guard let indexPath = indexPathsForVisibleItems.filter({ $0.row == currentIndex }).first,
+        let cell = cellForItem(at: indexPath) as? CCImagePreviewCell else { return }
+        cell.filpScale(withDoubleTap: sender)
     }
 }
 

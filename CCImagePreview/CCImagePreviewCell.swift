@@ -126,6 +126,16 @@ class CCImagePreviewCell: UICollectionViewCell {
             })
         }
     }
+    
+    func filpScale(withDoubleTap sender: UITapGestureRecognizer) {
+        if scrollView.zoomScale == scrollView.minimumZoomScale {
+            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
+        } else if scrollView.zoomScale == scrollView.maximumZoomScale {
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+        } else {
+            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
+        }
+    }
 }
 
 
