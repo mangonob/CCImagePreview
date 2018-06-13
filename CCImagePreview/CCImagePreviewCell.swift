@@ -163,13 +163,32 @@ class CCImagePreviewCell: UICollectionViewCell {
         }
     }
     
-    func filpScale(withDoubleTap sender: UITapGestureRecognizer) {
+    func flipScale(withDoubleTap sender: UITapGestureRecognizer) {
+        UIView.animate(withDuration: CATransaction.animationDuration()) { [weak self] in
+            self?.flipScaleWithOutAnimate(withDoubleTap: sender)
+        }
+    }
+    
+    private func flipScaleWithOutAnimate(withDoubleTap sender: UITapGestureRecognizer) {
         if scrollView.zoomScale == scrollView.minimumZoomScale {
-            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
+            var locationInZoomView = sender.location(in: zoomView)
+            locationInZoomView.x /= zoomView.bounds.size.width
+            locationInZoomView.y /= zoomView.bounds.size.height
+            
+            let locationInContent = sender.location(in: contentView)
+            
+            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: false)
+            
+            locationInZoomView.x *= zoomView.frame.size.width
+            locationInZoomView.y *= zoomView.frame.size.height
+            let origin = CGPoint(x: locationInZoomView.x - locationInContent.x,
+                                 y: locationInZoomView.y - locationInContent.y)
+            let rect = CGRect(origin: origin, size: contentView.bounds.size)
+            scrollView.scrollRectToVisible(rect, animated: false)
         } else if scrollView.zoomScale == scrollView.maximumZoomScale {
-            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
         } else {
-            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
         }
     }
 }

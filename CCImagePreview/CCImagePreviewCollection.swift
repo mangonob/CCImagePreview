@@ -125,7 +125,7 @@ class CCImagePreviewCollection: UICollectionView {
     @objc private func doubleTapHandler(_ sender: UITapGestureRecognizer) {
         guard let indexPath = indexPathsForVisibleItems.filter({ $0.row == currentIndex }).first,
         let cell = cellForItem(at: indexPath) as? CCImagePreviewCell else { return }
-        cell.filpScale(withDoubleTap: sender)
+        cell.flipScale(withDoubleTap: sender)
     }
 }
 
