@@ -51,9 +51,16 @@ class CCImagePreviewController: UIViewController {
         // Do any additional setup after loading the view.
         preview.previewDataSource = self
         preview.previewDelegate = self
-        view = preview
+        preview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        preview.frame = view.bounds
+        view.addSubview(preview)
+        
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(self.panHandler(_:)))
+        pan.cancelsTouchesInView = false
+        pan.delegate = self
+        view.addGestureRecognizer(pan)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -69,7 +76,19 @@ class CCImagePreviewController: UIViewController {
     }
     */
 
+    // MARK: - Action
+    @objc private func panHandler(_ sender: UIPanGestureRecognizer) {
+        print(sender.location(in: view))
+    }
 }
+
+
+extension CCImagePreviewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+}
+
 
 extension CCImagePreviewController: CCImagePreviewCollectionDataSource {
     func numberOfImages(inImagePreviewCollection collection: CCImagePreviewCollection) -> Int {
