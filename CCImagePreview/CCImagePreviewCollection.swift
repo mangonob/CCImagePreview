@@ -28,8 +28,14 @@ enum CCImagePreviewCollectionStyle: Int {
 class CCImagePreviewCollection: UICollectionView {
     private (set) var currentIndex: Int = 0
     
+    private var _currentIndex: Int = 0
     func setCurrentIndex(_ index: Int, animated: Bool) {
-        scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: animated)
+        guard index >= 0 && index < numberOfItems(inSection: 0) else { return }
+        _currentIndex = index
+        
+        if let offset = layoutAttributesForItem(at: IndexPath(row: index, section: 0))?.frame.origin {
+            setContentOffset(offset, animated: animated)
+        }
     }
 
     weak var previewDataSource: CCImagePreviewCollectionDataSource? {
@@ -121,6 +127,15 @@ class CCImagePreviewCollection: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private lazy var layoutSubviewsFirstTime: Void = {
+        setCurrentIndex(_currentIndex, animated: false)
+    }()
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        _ = layoutSubviewsFirstTime
+    }
+    
     // MARK: - Action
     @objc private func tapHandler(_ sender: Any) {
         guard shouldChangeStyleWhenTap else { return }
@@ -156,7 +171,8 @@ extension CCImagePreviewCollection: UIScrollViewDelegate {
         guard !progress.isNaN else { return }
 
         let N = CGFloat(previewDataSource?.numberOfImages(inImagePreviewCollection: self) ?? 0)
-        
+        guard N > 0 else { return }
+
         let standardProgress = min(max(progress, 0), 1)
         let standardIndex = Int(floor(standardProgress * N))
         if standardIndex != currentIndex {

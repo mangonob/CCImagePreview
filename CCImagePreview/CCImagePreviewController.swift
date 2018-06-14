@@ -12,9 +12,25 @@ import UIKit
     @objc optional func imagePreviewController(_ controller: CCImagePreviewController, selectImageAtIndex index: Int)
 }
 
+protocol CCImagePreviewControllerDataSource: AnyObject {
+    func numberOfImages(inPreviewController controller: CCImagePreviewController) -> Int
+    func previewController(_ controller: CCImagePreviewController, imageAtIndex index: Int) -> CCImage?
+}
+
 class CCImagePreviewController: UIViewController {
     weak var delegate: CCImagePreviewControllerDelegate?
+    weak var dataSource: CCImagePreviewControllerDataSource? {
+        didSet {
+            preview.reloadData()
+        }
+    }
 
+    var currentIndex: Int = 0 {
+        didSet {
+            preview.setCurrentIndex(currentIndex, animated: false)
+        }
+    }
+    
     var images = [CCImage]() {
         didSet {
             guard isViewLoaded else { return }
@@ -25,10 +41,6 @@ class CCImagePreviewController: UIViewController {
     private lazy var preview = CCImagePreviewCollection()
     
     override func viewDidLoad() {
-        images = [
-            #imageLiteral(resourceName: "image1"),#imageLiteral(resourceName: "image2"),#imageLiteral(resourceName: "image3")
-            ].map { CCImage.image($0) }
-        
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -56,11 +68,11 @@ class CCImagePreviewController: UIViewController {
 
 extension CCImagePreviewController: CCImagePreviewCollectionDataSource {
     func numberOfImages(inImagePreviewCollection collection: CCImagePreviewCollection) -> Int {
-        return images.count
+        return dataSource?.numberOfImages(inPreviewController: self) ?? 0
     }
     
     func imagePreviewCollection(_ collection: CCImagePreviewCollection, imageAtIndex index: Int) -> CCImage? {
-        return images[index]
+        return dataSource?.previewController(self, imageAtIndex: index)
     }
 }
 
