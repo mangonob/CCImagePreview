@@ -50,6 +50,7 @@ class CCImagePreviewController: UIViewController {
         // Do any additional setup after loading the view.
         preview.previewDataSource = self
         preview.previewDelegate = self
+        preview.scrollDelegate = self
         view = preview
     }
 
@@ -87,3 +88,12 @@ extension CCImagePreviewController: CCImagePreviewCollectionDelegate {
     }
 }
 
+
+extension CCImagePreviewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        print(scrollView)
+    }
+}

@@ -9,6 +9,8 @@
 import UIKit
 
 class CCImagePreviewCell: UICollectionViewCell {
+    weak var scrollDelegate: UIScrollViewDelegate?
+    
     lazy var scrollView = UIScrollView()
     lazy var zoomView = UIView()
     lazy var imageView = UIImageView()
@@ -211,5 +213,13 @@ extension CCImagePreviewCell: UIScrollViewDelegate {
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         updateContentOrigin()
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollDelegate?.scrollViewDidScroll?(scrollView)
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        scrollDelegate?.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
     }
 }

@@ -47,6 +47,7 @@ class ViewController: UIViewController {
         vc.dataSource = self
         vc.delegate = self
         vc.currentIndex = 2
+        vc.modalPresentationStyle = .overCurrentContext
         present(vc, animated: true, completion: nil)
     }
 }

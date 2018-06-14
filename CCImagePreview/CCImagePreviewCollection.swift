@@ -22,10 +22,20 @@ protocol CCImagePreviewCollectionDataSource: AnyObject {
 enum CCImagePreviewCollectionStyle: Int {
     case dark
     case light
+    
+    var color: UIColor {
+        switch self {
+        case .dark:
+            return UIColor.black
+        case .light:
+            return UIColor.white
+        }
+    }
 }
 
 
 class CCImagePreviewCollection: UICollectionView {
+    weak var scrollDelegate: UIScrollViewDelegate?
     private (set) var currentIndex: Int = 0
     
     private var _pendingIndex: Int = 0
@@ -58,17 +68,25 @@ class CCImagePreviewCollection: UICollectionView {
     
     var style: CCImagePreviewCollectionStyle = .dark {
         didSet {
-            switch style {
-            case .dark:
-                backgroundColor = .black
-                visibleCells.forEach { ($0 as? CCImagePreviewCell)?.marginColor = .black }
-            case .light:
-                backgroundColor = .white
-                visibleCells.forEach { ($0 as? CCImagePreviewCell)?.marginColor = .white }
-            }
+            updateBackground()
         }
     }
     
+    var backgroundAlpha: CGFloat = 1 {
+        didSet {
+            updateBackground()
+        }
+    }
+    
+    private var styleColorWithAlpha: UIColor {
+        return style.color.withAlphaComponent(backgroundAlpha)
+    }
+    
+    private func updateBackground() {
+        backgroundColor = styleColorWithAlpha
+        visibleCells.forEach { ($0 as? CCImagePreviewCell)?.marginColor = styleColorWithAlpha }
+    }
+
     var shouldChangeStyleWhenTap: Bool = true
     private var isRotating: Bool = false
     
@@ -164,7 +182,20 @@ class CCImagePreviewCollection: UICollectionView {
 
 
 extension CCImagePreviewCollection: UIScrollViewDelegate {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard scrollView != self else {
+            return
+        }
+        
+        scrollDelegate?.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView == self else {
+            scrollDelegate?.scrollViewDidScroll?(scrollView)
+            return
+        }
+        
         guard !isRotating else { return }
         
         let progress = (scrollView.contentOffset.x / scrollView.contentSize.width)
@@ -207,13 +238,7 @@ extension CCImagePreviewCollection: UICollectionViewDelegate {
         guard let cell = cell as? CCImagePreviewCell else { return }
         
         cell.imageUpdated()
-        
-        switch style {
-        case .dark:
-            cell.marginColor = .black
-        case .light:
-            cell.marginColor = .white
-        }
+        cell.marginColor = styleColorWithAlpha
     }
 }
 
@@ -245,6 +270,7 @@ extension CCImagePreviewCollection: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: previewCellIdentifier, for: indexPath) as! CCImagePreviewCell
         cell.link(withImage: previewDataSource?.imagePreviewCollection(self, imageAtIndex: indexPath.row))
+        cell.scrollDelegate = self
         return cell
     }
 }
