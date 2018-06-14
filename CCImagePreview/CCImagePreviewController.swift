@@ -14,17 +14,21 @@ import UIKit
 
 protocol CCImagePreviewControllerDataSource: AnyObject {
     func numberOfImages(inPreviewController controller: CCImagePreviewController) -> Int
-    func previewController(_ controller: CCImagePreviewController, imageAtIndex index: Int) -> CCImage?
+    func imagePreviewController(_ controller: CCImagePreviewController, imageAtIndex index: Int) -> CCImage?
 }
 
 class CCImagePreviewController: UIViewController {
     weak var delegate: CCImagePreviewControllerDelegate?
     weak var dataSource: CCImagePreviewControllerDataSource? {
         didSet {
-            preview.reloadData()
+            reloadData()
         }
     }
-
+    
+    func reloadData() {
+        preview.reloadData()
+    }
+    
     var currentIndex: Int = 0 {
         didSet {
             preview.setCurrentIndex(currentIndex, animated: false)
@@ -72,7 +76,7 @@ extension CCImagePreviewController: CCImagePreviewCollectionDataSource {
     }
     
     func imagePreviewCollection(_ collection: CCImagePreviewCollection, imageAtIndex index: Int) -> CCImage? {
-        return dataSource?.previewController(self, imageAtIndex: index)
+        return dataSource?.imagePreviewController(self, imageAtIndex: index)
     }
 }
 

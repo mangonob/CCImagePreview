@@ -28,11 +28,11 @@ enum CCImagePreviewCollectionStyle: Int {
 class CCImagePreviewCollection: UICollectionView {
     private (set) var currentIndex: Int = 0
     
-    private var _currentIndex: Int = 0
+    private var _pendingIndex: Int = 0
     func setCurrentIndex(_ index: Int, animated: Bool) {
+        _pendingIndex = index
         guard index >= 0 && index < numberOfItems(inSection: 0) else { return }
-        _currentIndex = index
-        
+
         if let offset = layoutAttributesForItem(at: IndexPath(row: index, section: 0))?.frame.origin {
             setContentOffset(offset, animated: animated)
         }
@@ -128,7 +128,7 @@ class CCImagePreviewCollection: UICollectionView {
     }
     
     private lazy var layoutSubviewsFirstTime: Void = {
-        setCurrentIndex(_currentIndex, animated: false)
+        setCurrentIndex(_pendingIndex, animated: false)
     }()
     
     override func layoutSubviews() {

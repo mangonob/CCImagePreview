@@ -120,14 +120,19 @@ class CCImagePreviewCell: UICollectionViewCell {
         }
     }()
     
+    private var oldSize: CGSize = .zero
     override func layoutSubviews() {
         super.layoutSubviews()
         _ = configureOnce
         
         layoutViews()
-        fitZoom()
-        
+
         marginRateUpdated()
+        
+        if oldSize != bounds.size {
+            oldSize = bounds.size
+            fitZoom()
+        }
     }
     
     private func layoutViews() {

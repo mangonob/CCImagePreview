@@ -16,6 +16,8 @@
 		4A30735A20CF741F00ABB135 /* CCImagePreviewCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A30735320CF741F00ABB135 /* CCImagePreviewCollection.swift */; };
 		4A30735B20CF741F00ABB135 /* ImagePreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A30735420CF741F00ABB135 /* ImagePreviewCell.swift */; };
 		4A30735F20CFAAC100ABB135 /* CCImagePreviewCell+SDWebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A30735E20CFAAC100ABB135 /* CCImagePreviewCell+SDWebImage.swift */; };
+		4AA5382220D2546800EF65F2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AA5382120D2546800EF65F2 /* ViewController.swift */; };
+		4AA5382420D2547900EF65F2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AA5382320D2547900EF65F2 /* Main.storyboard */; };
 		7D6CF239F13031B7C2756EE6 /* Pods_CCImagePreview.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A7BC7662B1381856C42DE2A /* Pods_CCImagePreview.framework */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +33,8 @@
 		4A30735320CF741F00ABB135 /* CCImagePreviewCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CCImagePreviewCollection.swift; sourceTree = "<group>"; };
 		4A30735420CF741F00ABB135 /* ImagePreviewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePreviewCell.swift; sourceTree = "<group>"; };
 		4A30735E20CFAAC100ABB135 /* CCImagePreviewCell+SDWebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CCImagePreviewCell+SDWebImage.swift"; sourceTree = "<group>"; };
+		4AA5382120D2546800EF65F2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4AA5382320D2547900EF65F2 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7A7BC7662B1381856C42DE2A /* Pods_CCImagePreview.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CCImagePreview.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		814DD8BAA05FC098B05F4844 /* Pods-CCImagePreview.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CCImagePreview.release.xcconfig"; path = "Pods/Target Support Files/Pods-CCImagePreview/Pods-CCImagePreview.release.xcconfig"; sourceTree = "<group>"; };
 		96945CB9C256316F260A62F3 /* Pods-CCImagePreview.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CCImagePreview.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CCImagePreview/Pods-CCImagePreview.debug.xcconfig"; sourceTree = "<group>"; };
@@ -78,6 +82,8 @@
 			isa = PBXGroup;
 			children = (
 				4A30734F20CF741F00ABB135 /* AppDelegate.swift */,
+				4AA5382120D2546800EF65F2 /* ViewController.swift */,
+				4AA5382320D2547900EF65F2 /* Main.storyboard */,
 				4A30735120CF741F00ABB135 /* CCImage.swift */,
 				4A30735E20CFAAC100ABB135 /* CCImagePreviewCell+SDWebImage.swift */,
 				4A30735220CF741F00ABB135 /* CCImagePreviewCell.swift */,
@@ -164,6 +170,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AA5382420D2547900EF65F2 /* Main.storyboard in Resources */,
 				4A30734820CF73EA00ABB135 /* LaunchScreen.storyboard in Resources */,
 				4A30734520CF73EA00ABB135 /* Assets.xcassets in Resources */,
 			);
@@ -250,6 +257,7 @@
 				4A30735F20CFAAC100ABB135 /* CCImagePreviewCell+SDWebImage.swift in Sources */,
 				4A30735720CF741F00ABB135 /* CCImagePreviewController.swift in Sources */,
 				4A30735920CF741F00ABB135 /* CCImagePreviewCell.swift in Sources */,
+				4AA5382220D2546800EF65F2 /* ViewController.swift in Sources */,
 				4A30735620CF741F00ABB135 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
