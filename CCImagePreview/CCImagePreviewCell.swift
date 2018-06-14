@@ -33,26 +33,30 @@ class CCImagePreviewCell: UICollectionViewCell {
 
     var marginRate: Float = 0 {
         didSet {
-            guard marginRate != oldValue else { return }
-            
-            if marginRate == 0 {
+            marginRateUpdated()
+        }
+    }
+    
+    private func marginRateUpdated() {
+        if marginRate == 0 {
+            if marginView.superview != nil {
                 marginView.removeFromSuperview()
+            }
+        } else {
+            if marginView.superview == nil {
+                contentView.addSubview(marginView)
+            }
+            
+            if marginRate > 0 {
+                let leftTop = CGPoint(x: zoomView.bounds.minX, y: zoomView.bounds.minY)
+                let width = max(0, zoomView.convert(leftTop, to: contentView).x)
+                    + CGFloat(marginRate) * marginLength
+                marginView.frame = contentView.bounds.divided(atDistance: width, from: .minXEdge).slice
             } else {
-                if marginView.superview == nil {
-                    contentView.addSubview(marginView)
-                }
-                
-                if marginRate > 0 {
-                    let leftTop = CGPoint(x: zoomView.bounds.minX, y: zoomView.bounds.minY)
-                    let width = max(0, zoomView.convert(leftTop, to: contentView).x)
-                        + CGFloat(marginRate) * marginLength
-                    marginView.frame = contentView.bounds.divided(atDistance: width, from: .minXEdge).slice
-                } else {
-                    let rightTop = CGPoint(x: zoomView.bounds.maxX, y: zoomView.bounds.maxY)
-                    let width = max(0, contentView.bounds.maxX - zoomView.convert(rightTop, to: contentView).x)
-                        - CGFloat(marginRate) * marginLength
-                    marginView.frame = contentView.bounds.divided(atDistance: width, from: .maxXEdge).slice
-                }
+                let rightTop = CGPoint(x: zoomView.bounds.maxX, y: zoomView.bounds.maxY)
+                let width = max(0, contentView.bounds.maxX - zoomView.convert(rightTop, to: contentView).x)
+                    - CGFloat(marginRate) * marginLength
+                marginView.frame = contentView.bounds.divided(atDistance: width, from: .maxXEdge).slice
             }
         }
     }
@@ -96,7 +100,6 @@ class CCImagePreviewCell: UICollectionViewCell {
         zoomView.frame = frame
     }
     
-    fileprivate var displayHandler: ((Notification) -> Void)?
     private lazy var configureOnce: Void = {
         scrollView.backgroundColor = .clear
         zoomView.backgroundColor = .clear
@@ -123,6 +126,8 @@ class CCImagePreviewCell: UICollectionViewCell {
         
         layoutViews()
         fitZoom()
+        
+        marginRateUpdated()
     }
     
     private func layoutViews() {

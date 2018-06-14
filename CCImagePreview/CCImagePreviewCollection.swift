@@ -26,7 +26,11 @@ enum CCImagePreviewCollectionStyle: Int {
 
 
 class CCImagePreviewCollection: UICollectionView {
-    var currentIndex: Int = 0
+    private (set) var currentIndex: Int = 0
+    
+    func setCurrentIndex(_ index: Int, animated: Bool) {
+        scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredHorizontally, animated: animated)
+    }
 
     weak var previewDataSource: CCImagePreviewCollectionDataSource? {
         didSet {
@@ -60,6 +64,7 @@ class CCImagePreviewCollection: UICollectionView {
     }
     
     var shouldChangeStyleWhenTap: Bool = true
+    private var isRotating: Bool = false
     
     private lazy var configureOnce: Void = {
         style = .dark
@@ -80,8 +85,31 @@ class CCImagePreviewCollection: UICollectionView {
         click.require(toFail: doubleTap)
         addGestureRecognizer(click)
         addGestureRecognizer(doubleTap)
+        
+        if #available(iOS 11, *) {
+            contentInsetAdjustmentBehavior = .never
+        }
+        
+        NotificationCenter.default
+            .addObserver(forName: .UIApplicationWillChangeStatusBarOrientation, object: nil, queue: nil,
+                         using: { [weak self] (_) in
+                            self?.isRotating = true
+                            self?.collectionViewLayout.invalidateLayout()
+            })
+        
+        NotificationCenter.default
+            .addObserver(forName: .UIApplicationDidChangeStatusBarOrientation, object: nil, queue: nil,
+                         using: { [weak self] (_) in
+                            defer { self?.isRotating = false }
+                            
+                            guard let collection = self else { return }
+                            
+                            if let rect = collection.layoutAttributesForItem(at: IndexPath(row: collection.currentIndex, section: 0))?.frame {
+                                collection.contentOffset = rect.origin
+                            }
+            })
     }()
-
+    
     init() {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
@@ -91,16 +119,6 @@ class CCImagePreviewCollection: UICollectionView {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    private var oldBounds: CGRect!
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        if bounds != oldBounds {
-            collectionViewLayout.invalidateLayout()
-            oldBounds = bounds
-        }
     }
     
     // MARK: - Action
@@ -132,6 +150,8 @@ class CCImagePreviewCollection: UICollectionView {
 
 extension CCImagePreviewCollection: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard !isRotating else { return }
+        
         let progress = (scrollView.contentOffset.x / scrollView.contentSize.width)
         guard !progress.isNaN else { return }
 
