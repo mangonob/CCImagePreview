@@ -35,7 +35,6 @@ enum CCImagePreviewCollectionStyle: Int {
 
 
 class CCImagePreviewCollection: UICollectionView {
-    weak var scrollDelegate: UIScrollViewDelegate?
     private (set) var currentIndex: Int = 0
     
     private var _pendingIndex: Int = 0
@@ -182,20 +181,7 @@ class CCImagePreviewCollection: UICollectionView {
 
 
 extension CCImagePreviewCollection: UIScrollViewDelegate {
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        guard scrollView != self else {
-            return
-        }
-        
-        scrollDelegate?.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
-    }
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard scrollView == self else {
-            scrollDelegate?.scrollViewDidScroll?(scrollView)
-            return
-        }
-        
         guard !isRotating else { return }
         
         let progress = (scrollView.contentOffset.x / scrollView.contentSize.width)
@@ -270,7 +256,6 @@ extension CCImagePreviewCollection: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: previewCellIdentifier, for: indexPath) as! CCImagePreviewCell
         cell.link(withImage: previewDataSource?.imagePreviewCollection(self, imageAtIndex: indexPath.row))
-        cell.scrollDelegate = self
         return cell
     }
 }

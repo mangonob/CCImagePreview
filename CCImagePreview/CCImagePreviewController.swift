@@ -42,15 +42,15 @@ class CCImagePreviewController: UIViewController {
         }
     }
     
+    private var leastInteractionScrollView: UIScrollView!
     private lazy var preview = CCImagePreviewCollection()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         preview.previewDataSource = self
         preview.previewDelegate = self
-        preview.scrollDelegate = self
         view = preview
     }
 
@@ -85,15 +85,5 @@ extension CCImagePreviewController: CCImagePreviewCollectionDataSource {
 extension CCImagePreviewController: CCImagePreviewCollectionDelegate {
     func imagePreviewCollection(_ collection: CCImagePreviewCollection, currentIndexChanged index: Int) {
         delegate?.imagePreviewController?(self, selectImageAtIndex: index)
-    }
-}
-
-
-extension CCImagePreviewController: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        print(scrollView)
     }
 }
