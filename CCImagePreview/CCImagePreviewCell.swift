@@ -8,6 +8,7 @@
 
 import UIKit
 
+
 class CCImagePreviewCell: UICollectionViewCell {
     lazy var scrollView = UIScrollView()
     lazy var zoomView = UIView()
@@ -92,7 +93,7 @@ class CCImagePreviewCell: UICollectionViewCell {
         updateContentOrigin()
     }
     
-    fileprivate func updateContentOrigin() {
+    func updateContentOrigin() {
         var frame = zoomView.frame
         let x = (scrollView.bounds.size.width - frame.size.width) / 2
         let y = (scrollView.bounds.size.height - frame.size.height) / 2
@@ -114,6 +115,8 @@ class CCImagePreviewCell: UICollectionViewCell {
         scrollView.alwaysBounceHorizontal = true
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
+
+        zoomView.isUserInteractionEnabled = false
         
         if #available(iOS 11, *) {
             scrollView.contentInsetAdjustmentBehavior = .never
@@ -125,12 +128,11 @@ class CCImagePreviewCell: UICollectionViewCell {
         super.layoutSubviews()
         _ = configureOnce
         
-        layoutViews()
-
-        marginRateUpdated()
-        
         if oldSize != bounds.size {
             oldSize = bounds.size
+            
+            marginRateUpdated()
+            layoutViews()
             fitZoom()
         }
     }

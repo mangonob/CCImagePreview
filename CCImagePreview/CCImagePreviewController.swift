@@ -77,8 +77,42 @@ class CCImagePreviewController: UIViewController {
     */
 
     // MARK: - Action
+    private lazy var startCenter: CGPoint = .zero
     @objc private func panHandler(_ sender: UIPanGestureRecognizer) {
-        print(sender.location(in: view))
+        guard let scrollView = view.hitTest(sender.location(in: view), with: nil) as? UIScrollView,
+            let zoomView = scrollView.subviews.first,
+            let cell = scrollView.superview?.superview as? CCImagePreviewCell else { return }
+        
+        let progress = min(max(sender.translation(in: scrollView).y / 100, 0), 1)
+        
+        switch sender.state {
+        case .began:
+            guard sender.translation(in: scrollView).y > 0 else {
+                sender.isEnabled = false
+                sender.isEnabled = true
+                return
+            }
+        
+            startCenter = zoomView.center
+            scrollView.isScrollEnabled = false
+        case .changed:
+            guard !scrollView.isZooming else { return }
+            zoomView.center = CGPoint(x: startCenter.x + sender.translation(in: scrollView).x,
+                                      y: startCenter.y + sender.translation(in: scrollView).y)
+            preview.backgroundAlpha = 1 - progress
+        default:
+            scrollView.isScrollEnabled = true
+            if progress < 1 {
+                UIView.animate(withDuration: CATransaction.animationDuration(), animations: { [weak self] in
+                    cell.updateContentOrigin()
+                    self?.preview.backgroundAlpha = 1
+                })
+            } else {
+                dismiss(animated: false, completion: nil)
+            }
+        }
+        
+        print(arc4random() % 42)
     }
 }
 
