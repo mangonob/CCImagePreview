@@ -78,6 +78,7 @@ class CCImagePreviewController: UIViewController {
 
     // MARK: - Action
     private lazy var startCenter: CGPoint = .zero
+    private lazy var contentOriginEnded: Bool = true
     @objc private func panHandler(_ sender: UIPanGestureRecognizer) {
         guard let scrollView = view.hitTest(sender.location(in: view), with: nil) as? UIScrollView,
             let zoomView = scrollView.subviews.first,
@@ -87,7 +88,8 @@ class CCImagePreviewController: UIViewController {
         
         switch sender.state {
         case .began:
-            guard sender.translation(in: scrollView).y > 0 else {
+            let v = sender.velocity(in: scrollView)
+            guard v.y > 0 && abs(atan(v.x / v.y)) < CGFloat.pi / 6 else {
                 sender.isEnabled = false
                 sender.isEnabled = true
                 return
@@ -95,17 +97,23 @@ class CCImagePreviewController: UIViewController {
         
             startCenter = zoomView.center
             scrollView.isScrollEnabled = false
+            preview.isScrollEnabled = false
         case .changed:
             guard !scrollView.isZooming else { return }
+            guard !scrollView.isTracking else { return }
             zoomView.center = CGPoint(x: startCenter.x + sender.translation(in: scrollView).x,
                                       y: startCenter.y + sender.translation(in: scrollView).y)
             preview.backgroundAlpha = 1 - progress
         default:
             scrollView.isScrollEnabled = true
+            preview.isScrollEnabled = true
             if progress < 1 {
+                contentOriginEnded = false
                 UIView.animate(withDuration: CATransaction.animationDuration(), animations: { [weak self] in
                     cell.updateContentOrigin()
                     self?.preview.backgroundAlpha = 1
+                    }, completion: { [weak self] (_) in
+                        self?.contentOriginEnded = true
                 })
             } else {
                 dismiss(animated: false, completion: nil)
