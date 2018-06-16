@@ -18,6 +18,8 @@ protocol CCImagePreviewControllerDataSource: AnyObject {
 }
 
 class CCImagePreviewController: UIViewController {
+    var initialView: UIView!
+    
     weak var delegate: CCImagePreviewControllerDelegate?
     weak var dataSource: CCImagePreviewControllerDataSource? {
         didSet {
@@ -25,6 +27,21 @@ class CCImagePreviewController: UIViewController {
         }
     }
     
+    private (set) lazy var configureOnce: Void = {
+        transitioningDelegate = self
+        modalPresentationStyle = .overCurrentContext
+    }()
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        _ = configureOnce
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+
     func reloadData() {
         preview.reloadData()
     }
@@ -32,13 +49,6 @@ class CCImagePreviewController: UIViewController {
     var currentIndex: Int = 0 {
         didSet {
             preview.setCurrentIndex(currentIndex, animated: false)
-        }
-    }
-    
-    var images = [CCImage]() {
-        didSet {
-            guard isViewLoaded else { return }
-            preview.reloadData()
         }
     }
     
@@ -116,7 +126,7 @@ class CCImagePreviewController: UIViewController {
                         self?.contentOriginEnded = true
                 })
             } else {
-                dismiss(animated: false, completion: nil)
+                dismiss(animated: true, completion: nil)
             }
         }
     }
@@ -146,3 +156,28 @@ extension CCImagePreviewController: CCImagePreviewCollectionDelegate {
         delegate?.imagePreviewController?(self, selectImageAtIndex: index)
     }
 }
+
+
+extension CCImagePreviewController: CCImagePreviewTransitionDelegate {
+    func targetColor(forTransition transition: CCImagePreviewTransition) -> UIColor? {
+        return preview.backgroundColor
+    }
+}
+
+
+extension CCImagePreviewController: UIViewControllerTransitioningDelegate {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let initialView = initialView else {
+            fatalError("\(self) initialView can not be nil.")
+        }
+        return CCImagePreviewTransition(delegate: self, initialView: initialView, image: (dataSource?.imagePreviewController(self, imageAtIndex: 2))!, isPresent: true)
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let scrollView = view.hitTest(CGPoint(x: view.bounds.midX, y: view.bounds.midY), with: nil),
+            let zoomView = scrollView.subviews.first else { return nil }
+        
+        return CCImagePreviewTransition(delegate: self, initialView: initialView, image: (dataSource?.imagePreviewController(self, imageAtIndex: currentIndex))!, isPresent: false, targetView: zoomView)
+    }
+}
+

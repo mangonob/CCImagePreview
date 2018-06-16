@@ -9,6 +9,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+    @IBOutlet weak var presentButton: UIButton!
+    
     var images: [CCImage] = {
         let imageURLStrings = [
             "http://devstreaming.apple.com/videos/wwdc/2015/1014o78qhj07pbfxt9g7/101/images/101_734x413.jpg",
@@ -41,14 +43,16 @@ class ViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    var previewController: CCImagePreviewController!
 
     @IBAction func previewAction(_ sender: Any) {
-        let vc = CCImagePreviewController()
-        vc.dataSource = self
-        vc.delegate = self
-        vc.currentIndex = 2
-        vc.modalPresentationStyle = .overCurrentContext
-        present(vc, animated: true, completion: nil)
+        previewController = CCImagePreviewController()
+        previewController.dataSource = self
+        previewController.delegate = self
+        previewController.currentIndex = 2
+        previewController.initialView = presentButton
+        present(previewController, animated: true, completion: nil)
     }
 }
 
@@ -65,3 +69,4 @@ extension ViewController: CCImagePreviewControllerDataSource {
         return images[index]
     }
 }
+
