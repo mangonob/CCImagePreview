@@ -111,8 +111,6 @@ class CCImagePreviewController: UIViewController {
                 dismiss(animated: false, completion: nil)
             }
         }
-        
-        print(arc4random() % 42)
     }
 }
 

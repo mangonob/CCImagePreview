@@ -223,7 +223,7 @@ extension CCImagePreviewCollection: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? CCImagePreviewCell else { return }
         
-//        cell.imageUpdated()
+        cell.imageUpdated()
         cell.marginColor = styleColorWithAlpha
     }
 }
